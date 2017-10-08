@@ -1,0 +1,68 @@
+<html>
+
+    <head>
+        <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+    </head>
+
+    <body>
+
+        <div id="app">
+            <ul>
+                <li v-for="m in messages" :style="idColor(m.id)">{{m.type}} {{m.id}}</li>
+            </ul>
+        </div>
+
+        <script>
+
+            var app = new Vue({
+                el: '#app',
+                mounted: function(){
+
+                    const that = this;
+
+                    const socket = io();
+
+                    socket.on('discoverd', function(id){
+                        that.assignColorToId(id);
+                        that.messages.push({type: 'discoverd', id: id});
+                    });
+
+                    socket.on('connected', function(id){
+                        that.assignColorToId(id);
+                        that.messages.push({type: 'connected', id: id});
+                    });
+
+                },
+                data: {
+                    messages: [],
+                    ids: {}
+                },
+                methods: {
+                    color: function(){
+                        var letters = '0123456789ABCDEF';
+                        var color = '#';
+                        for (var i = 0; i < 6; i++) {
+                            color += letters[Math.floor(Math.random() * 16)];
+                        }
+                        return color;
+                    },
+                    assignColorToId(id){
+
+                        if("undefined" === typeof this.ids[id]){
+                            console.log(this.color());
+                            this.ids[id] = this.color();
+                        }
+
+                    },
+                    idColor(id){
+                        return {color: this.ids[id]}
+                    }
+                }
+            });
+
+        </script>
+
+    </body>
+
+</html>
